@@ -1,7 +1,16 @@
 import React, { useState } from "react";
+import items from "../data/items";
 
 function Item({ name, category }) {
-  const [isInCart, setIsInCart] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);  
+
+  const item = items.find((item) => item.name === name);
+
+  if(!item) {
+    return null;
+  }
+
+  // console.log(item);
 
   function handleAddToCartClick() {
     setIsInCart((isInCart) => !isInCart);
