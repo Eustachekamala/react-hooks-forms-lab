@@ -2,44 +2,46 @@ import React, { useState } from "react";
 import { v4 as uuid } from "uuid";
 
 function ItemForm({ onItemFormSubmit }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    category: "Produce",
-  });
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("Produce");
 
+  // TODO: Add unique id to each item
+  const [items, setItems] = useState([{ name, category }]); 
+
+  // Handles the change event for the form fields
   function handleChange(event) {
     const { name, value } = event.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
+    if (name === "name") {
+      setName(value);
+    } else if (name === "category") {
+      setCategory(value);
+    }
   }
-
+  
+  // Handles the submit event for the form
   function handleSubmit(event) {
     event.preventDefault();
 
     // Check for empty fields
-    if (!formData.name || !formData.category) {
+    if (!name || !category) {
       alert("Please fill out all fields.");
       return;
     }
 
     const newItem = {
       id: uuid(), // Generate a unique id for the new item
-      name: formData.name,
-      category: formData.category,
+      name: name,
+      category: category,
     };
 
-    console.log(newItem);
-
-    // Call the parent function to add the new item
     onItemFormSubmit(newItem);
 
+    // Call the parent function to add the new item
+    setItems((prevItems) => [...prevItems, { ...newItem, id: prevItems.length + 1 }]);
+
     // Clear the form
-    setFormData({
-      name: "",
-      category: "Produce",
-    });
+    setName("");
+    setCategory("Produce");
   }
 
   return (
@@ -49,8 +51,9 @@ function ItemForm({ onItemFormSubmit }) {
         <input
           type="text"
           name="name"
-          value={formData.name}
+          value={name}
           onChange={handleChange}
+          required="required"
         />
       </label>
 
@@ -58,7 +61,7 @@ function ItemForm({ onItemFormSubmit }) {
         Category:
         <select
           name="category"
-          value={formData.category}
+          value={category}
           onChange={handleChange}
         >
           <option value="Produce">Produce</option>
@@ -67,7 +70,9 @@ function ItemForm({ onItemFormSubmit }) {
         </select>
       </label>
 
-      <button type="submit">Add to List</button>
+      <button type="submit">
+        Add to List
+      </button>
     </form>
   );
 }

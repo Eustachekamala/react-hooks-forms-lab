@@ -5,32 +5,41 @@ import Item from "./Item";
 
 function ShoppingList({ items }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [item,setItems] = useState([...items]);
+  const [itemsList, setItemsList] = useState([...items]);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Handles the category change event
   function handleCategoryChange(event) {
     setSelectedCategory(event.target.value);
   }
-  
-  function handleSearchTermChange(event) {
-    setSearchTerm(event.target.value);
+
+  // Handles the search term change event
+  function handleSearchTermChange(term) {
+    setSearchTerm(term);
   }
 
-
-  const itemsToDisplay = items.filter((item) => {
-    if (selectedCategory === "All") return true;
-
-    return item.category === selectedCategory;
+  // Filters the items based on the selected category and search term
+  const itemsToDisplay = itemsList.filter((item) => {
+    const matchesCategory = selectedCategory === "All" || item.category === selectedCategory;
+    const matchesSearchTerm = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearchTerm;
   });
 
-  function handleItemFormSubmit(newItem) {
-    setItems((items) => [...items, newItem]);
+  // Handles the item form submit event
+  function addItem(newItem) {
+    // Generate a unique id for the new item
+    const newId = itemsList.length ? Math.max(itemsList.map(item => item.id)) + 1 : 1;
+    setItemsList((prevItems) => [...prevItems, { ...newItem, id: newId }]);
   }
 
   return (
     <div className="ShoppingList">
-      <ItemForm onItemFormSubmit={handleItemFormSubmit} item={item} setItems={setItems}/>
-      <Filter onCategoryChange={handleCategoryChange} onSearchItem = {handleSearchTermChange} searchTerm={searchTerm}/>
+      <ItemForm onItemFormSubmit={addItem} />
+      <Filter
+        onCategoryChange={handleCategoryChange}
+        onSearchChange={handleSearchTermChange}
+        search={searchTerm} // Pass searchTerm as search prop
+      />
       <ul className="Items">
         {itemsToDisplay.map((item) => (
           <Item key={item.id} name={item.name} category={item.category} />
